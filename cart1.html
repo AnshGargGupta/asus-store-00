@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASUS Cart & Order</title>
+  <style>
+    body {
+      background: radial-gradient(circle at top left, #0f2027, #203a43, #2c5364);
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0; padding: 0;
+    }
+    nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 15px 40px;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(20px);
+      border-bottom:1px solid rgba(255,255,255,0.2);
+    }
+    nav h1 {color:#00ffff;}
+    .container {
+      max-width: 800px; margin: 40px auto; padding: 20px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 20px; backdrop-filter: blur(15px);
+    }
+    h2 {text-align: center; margin-bottom: 20px;}
+    table {
+      width: 100%; border-collapse: collapse; margin-bottom: 20px;
+    }
+    th, td {
+      padding: 12px; text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    th {color:#00ffff;}
+    form {
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    input, textarea {
+      padding: 10px; border: none; border-radius: 10px;
+      outline: none; font-size: 14px;
+    }
+    button {
+      padding: 12px; border: none; border-radius: 30px;
+      background:#00ffff; color:black; font-weight: bold;
+      cursor: pointer; transition: 0.3s;
+    }
+    button:hover {background: white;}
+
+   /* Footer */
+footer {
+  padding: 2rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  margin-top: 2rem;
+  border-radius: 20px 20px 0 0;
+}
+footer p {
+  margin: 0.5rem 0;
+  opacity: 0.8;
+}
+
+
+
+  </style>
+
+</head>
+<body>
+  <nav>
+    <h1>ASUS STORE</h1>
+    <ul style="list-style:none;display:flex;gap:20px;">
+      <li><a href="index1.html" style="color:white;text-decoration:none;">Back to Shop</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <h2>Your Cart</h2>
+    <table id="cart-table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Price (₹)</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <h3 id="total">Total: ₹0</h3>
+<input type="text" id="coupon" placeholder="Enter Coupon Code (optional)">
+    <button onclick="applyCoupon()">Apply Coupon</button>
+    <button onclick="clearCart()">Clear Cart</button>
+
+
+    <h2>Customer Details</h2>
+   <form action="https://formsubmit.co/gargansh328@gmail.com" method="POST" id="orderForm">
+
+      <input type="text" name="Name" placeholder="Your Name" required>
+      <input type="email" name="Email" placeholder="Your Email" required>
+      <input type="tel" name="Phone" placeholder="Phone Number" required>
+      <textarea name="Address" placeholder="Delivery Address" rows="3" required></textarea>
+      <input type="hidden" name="Order" id="orderDetails">
+      <button type="submit">Place Order</button>
+      <input type="hidden" name="Total" id="orderTotal">
+    </form>
+  </div>
+<div class="main-content">
+<footer class="glass">
+    <p>Phone: 7889196330 | Email: gargansh328@gmail.com | Punjab, India</p>
+  </footer>
+</div>
+
+
+ 
+  <script>
+let cart=JSON.parse(localStorage.getItem("cart"))||[];
+let discount=0;
+const tableBody=document.querySelector("#cart-table tbody");
+const totalEl=document.getElementById("total");
+
+function renderCart(){
+  tableBody.innerHTML="";
+  let total=0;
+  cart.forEach(item=>{
+    let row=document.createElement("tr");
+    row.innerHTML=`<td>${item.name}</td><td>₹${item.price}</td>`;
+    tableBody.appendChild(row);
+    total+=item.price;
+  });
+  let final=total-discount;
+  totalEl.innerText="Total: ₹"+final;
+}
+renderCart();
+
+function clearCart(){
+  cart=[];localStorage.setItem("cart",JSON.stringify(cart));discount=0;renderCart();
+}
+
+function applyCoupon(){
+  const code=document.getElementById("coupon").value.trim();
+  let total=cart.reduce((a,b)=>a+b.price,0);
+  const valid=["ANSH","HAPPY100","LAPTOP1234"];
+  if(valid.includes(code)){discount=total*0.1;alert("Coupon applied! 10% off");}
+  else{discount=0;alert("Invalid coupon");}
+  renderCart();
+}
+
+document.getElementById("orderForm").onsubmit=function(){
+  let orderText=cart.map(i=>`${i.name} - ₹${i.price}`).join(", ");
+  document.getElementById("orderDetails").value=orderText;
+  document.getElementById("orderTotal").value=totalEl.innerText;
+  // Save order history by user
+  let user=localStorage.getItem("user")||"guest";
+  let history=JSON.parse(localStorage.getItem(user+"_history"))||[];
+  history.push({order:orderText,total:totalEl.innerText,date:new Date().toLocaleString()});
+  localStorage.setItem(user+"_history",JSON.stringify(history));
+};
+</script>
+</body>
+</html>
